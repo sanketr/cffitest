@@ -16,7 +16,7 @@ void initThreads(int nThreads, FnPtr* fns)
   //create mutexes for each thread
   gLock = (pthread_mutex_t*) malloc (gThreads * sizeof(pthread_mutex_t));
   pthread_mutexattr_t mutexAttr;
-  pthread_mutexattr_settype(&mutexAttr,PTHREAD_MUTEX_NORMAL);
+  pthread_mutexattr_settype(&mutexAttr,NULL);
   int i;
   //initialize the mutexes
   for(i=0;i<gThreads;i++){
