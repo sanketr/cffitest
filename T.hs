@@ -17,6 +17,8 @@ foreign import ccall "wrapper"
 foreign import ccall safe "mt.h sendSignal"
   sendSignal :: CShort -> IO()
 
+foreign import ccall safe "test.h initThreads"
+  initThreads :: CInt -> Ptr (FunPtr (IO())) -> IO()
 
 syncWithC :: MVar CInt -> MVar CInt -> CInt -> IO ()
 syncWithC m1 m2 x = do
@@ -41,19 +43,22 @@ timerevent m1 m2 t =  run where
       where 
       listOfThreads = [0..fromIntegral $ (length m1) - 1]
 
-foreign import ccall safe "test.h initThreads"
-  initThreads :: CInt -> Ptr (FunPtr (IO())) -> IO()
-
 getPtr :: (SV.Storable a) => SV.Vector a -> Ptr a
 getPtr = unsafeForeignPtrToPtr . (\(x,_,_) -> x) . SV.unsafeToForeignPtr
 
 main :: IO ()
 main = do
   let nThreads = 12 
+  -- create two mvar lists for C FFI threads
   m1 <- mapM (const newEmptyMVar) [1..nThreads] :: IO [MVar CInt]
   m2 <- mapM (const newEmptyMVar) [1..nThreads] :: IO [MVar CInt]
+  -- create callback functions for each of C thread - it will call back syncWithC with no arguments
   fnptrs <- mapM (\(x,y) -> syncWithCWrap $ syncWithC x y 0) (zip m1 m2)
+  -- create a storable vector of function ptrs - we will pass ptr to function ptrs to C FFI
   let vfnptrs = SV.fromList fnptrs
+  -- kick off C FFI - fork in background 
   forkIO $ initThreads nThreads (getPtr vfnptrs)
+  -- kick off timer thread to coordinate with C FFI threads - every ~0.5 seconds, it 
+  -- will sendSignal function in C FFI for each thread. sendSignal calls back syncWithC
   timerevent m1 m2 500000
   return ()

@@ -2,7 +2,7 @@ This test reproduces an issue with C FFI I have seen - the number of worker thre
 
 To reproduce the issue:
 
-- Set nThreads in T.hs (line 52) to a high number, for example, 10. That will kick off nThreads threads in C FFI
+- Set nThreads in T.hs (line 51) to a high number, for example, 10. That will kick off nThreads threads in C FFI
 
 - Compile the code (need gcc too): make
 

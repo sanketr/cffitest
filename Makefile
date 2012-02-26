@@ -6,4 +6,4 @@ install:
 	rm -rf *stub* *.hi
 
 clean: 
-	rm -rf *.o c t T *.hi *stub*
+	rm -rf *.o T *.hi *stub*

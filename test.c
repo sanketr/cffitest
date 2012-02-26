@@ -29,7 +29,7 @@ void initThreads(int nThreads, FnPtr* fns)
 
 void* doSomething(void* threadid){
   int i = *(int*) threadid;
-  printf("ThreadId %i\n",i);
+  printf("Started thread %i\n",i);
   int j;
   //start filling the buffers here
   for(j=0; j < MAXITERATIONS;j++){
