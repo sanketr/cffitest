@@ -35,7 +35,6 @@ void* doSomething(void* threadid){
   for(j=0; j < MAXITERATIONS;j++){
     pthread_mutex_lock(&gLock[i]);
     pthread_mutex_unlock(&gLock[i]);
-    usleep(10000);
   }
   sleep(1000000);
   printf("Thread done\n");
