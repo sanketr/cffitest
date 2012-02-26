@@ -48,7 +48,7 @@ getPtr = unsafeForeignPtrToPtr . (\(x,_,_) -> x) . SV.unsafeToForeignPtr
 
 main :: IO ()
 main = do
-  let nThreads = 12 
+  let nThreads = 7 
   -- create two mvar lists for C FFI threads
   m1 <- mapM (const newEmptyMVar) [1..nThreads] :: IO [MVar CInt]
   m2 <- mapM (const newEmptyMVar) [1..nThreads] :: IO [MVar CInt]

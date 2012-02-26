@@ -3,8 +3,8 @@
 
 void startTest(int);
 
-int gThreads = 0; //number of threads
-FnPtr* gFn = NULL;
+static int gThreads = 0; //number of threads
+static FnPtr* gFn = NULL;
 static pthread_mutex_t* gLock = NULL;
 
 void initThreads(int nThreads, FnPtr* fns)
