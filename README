@@ -1,0 +1,13 @@
+This test reproduces an issue with C FFI I have seen - the number of worker threads start going up if number of C FFI threads is set beyond a threshold. On my test machine, the threshold seems to be 6. I am using ghc 7.4.1.
+
+To reproduce the issue:
+
+- Set nThreads in T.hs (line 52) to a high number, for example, 10. That will kick off nThreads threads in C FFI
+
+- Compile the code (need gcc too): make
+
+- Start the test: ./T -N3 +RTS -s 
+
+- You will see messages being printed on console. After a few "Processed data" messages have been printed (i.e., a few timer events have executed), kill the process by sending ctrl-c. RTS will show output, listing number of worker threads. They should be higher than 12. The more iterations there are, the more worker threads there should be.
+
+I am unable to reproduce the segmentation fault using this simple test case though. 
