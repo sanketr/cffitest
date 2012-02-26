@@ -3,7 +3,7 @@
 
 void startTest(int);
 
-int gThreads = 0; //number of mama threads
+int gThreads = 0; //number of threads
 FnPtr* gFn = NULL;
 static pthread_mutex_t* gLock = NULL;
 
@@ -13,7 +13,7 @@ void initThreads(int nThreads, FnPtr* fns)
   gThreads = nThreads;
   //set function pointers
   gFn = fns;
-  //create mutexes for each mama thread
+  //create mutexes for each thread
   gLock = (pthread_mutex_t*) malloc (gThreads * sizeof(pthread_mutex_t));
   pthread_mutexattr_t mutexAttr;
   pthread_mutexattr_settype(&mutexAttr,PTHREAD_MUTEX_NORMAL);
