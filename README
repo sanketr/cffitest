@@ -10,4 +10,8 @@ To reproduce the issue:
 
 - You will see messages being printed on console. After a few "Processed data" messages have been printed (i.e., a few timer events have executed), kill the process by sending ctrl-c. RTS will show output, listing number of worker threads. They should be higher than 12. The more iterations there are, the more worker threads there should be.
 
-I am unable to reproduce the segmentation fault using this simple test case though. 
+I can reproduce the segmentation fault using this simple test case if I set nThreads to a high number like 30, on Mac. On Linux, segmentation fault happens but not very often. Core dump on Mac shows output similar to below:
+
+#0  0x00007fff9321fbca in __psynch_cvwait ()
+
+It seems to happen in mvar callback. 

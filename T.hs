@@ -17,7 +17,7 @@ foreign import ccall "wrapper"
 foreign import ccall safe "mt.h sendSignal"
   sendSignal :: CShort -> IO()
 
-foreign import ccall safe "test.h initThreads"
+foreign import ccall safe "test.c initThreads"
   initThreads :: CInt -> Ptr (FunPtr (IO())) -> IO()
 
 syncWithC :: MVar CInt -> MVar CInt -> CInt -> IO ()
@@ -48,7 +48,7 @@ getPtr = unsafeForeignPtrToPtr . (\(x,_,_) -> x) . SV.unsafeToForeignPtr
 
 main :: IO ()
 main = do
-  let nThreads = 7 
+  let nThreads = 30 
   -- create two mvar lists for C FFI threads
   m1 <- mapM (const newEmptyMVar) [1..nThreads] :: IO [MVar CInt]
   m2 <- mapM (const newEmptyMVar) [1..nThreads] :: IO [MVar CInt]
@@ -60,5 +60,5 @@ main = do
   forkIO $ initThreads nThreads (getPtr vfnptrs)
   -- kick off timer thread to coordinate with C FFI threads - every ~0.5 seconds, it 
   -- will sendSignal function in C FFI for each thread. sendSignal calls back syncWithC
-  timerevent m1 m2 500000
+  timerevent m1 m2 500
   return ()
