@@ -7,6 +7,7 @@ import Foreign.Ptr (Ptr, FunPtr, castPtr)
 import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
 import Foreign.C.Types (CInt,CUInt,CShort, CFloat,CDouble,CChar)
 import Foreign.C
+import Foreign.Marshal.Array (newArray)
 import qualified Data.Vector.Storable as SV (Storable, Vector, fromList, unsafeToForeignPtr)
 
 -- a "wrapper" import is a converter for converting a Haskell 
@@ -48,16 +49,16 @@ getPtr = unsafeForeignPtrToPtr . (\(x,_,_) -> x) . SV.unsafeToForeignPtr
 
 main :: IO ()
 main = do
-  let nThreads = 30 
+  let nThreads = 5 
   -- create two mvar lists for C FFI threads
   m1 <- mapM (const newEmptyMVar) [1..nThreads] :: IO [MVar CInt]
   m2 <- mapM (const newEmptyMVar) [1..nThreads] :: IO [MVar CInt]
   -- create callback functions for each of C thread - it will call back syncWithC with no arguments
   fnptrs <- mapM (\(x,y) -> syncWithCWrap $ syncWithC x y 0) (zip m1 m2)
   -- create a storable vector of function ptrs - we will pass ptr to function ptrs to C FFI
-  let vfnptrs = SV.fromList fnptrs
+  vfnptrs <- newArray fnptrs
   -- kick off C FFI - fork in background 
-  forkIO $ initThreads nThreads (getPtr vfnptrs)
+  forkIO $ initThreads nThreads vfnptrs
   -- kick off timer thread to coordinate with C FFI threads - every ~0.5 seconds, it 
   -- will sendSignal function in C FFI for each thread. sendSignal calls back syncWithC
   timerevent m1 m2 500
